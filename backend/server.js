@@ -4,7 +4,6 @@ import session from 'express-session';
 import MongoDbStore from 'connect-mongodb-session';
 import connectDB from './utils/connectDb.js';
 import user from './routes/user.js';
-import item from './routes/item.js';
 
 const app = express();
 const store = MongoDbStore(session);
@@ -26,7 +25,6 @@ app.use(
 );
 
 app.use('/user', user);
-app.use(item)
 
 app.listen(5000, () => {
   console.log('Server is running on port 5000');
