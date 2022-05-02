@@ -13,7 +13,7 @@ export const protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    res.status(400).json(error);
+    res.status(400).json(error).redirect('http://localhost:3000/login');
   }
 };
 

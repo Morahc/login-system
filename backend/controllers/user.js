@@ -43,10 +43,9 @@ export const loginUser = async (req, res) => {
   }
 };
 
-
 export const logoutUser = async (req, res) => {
   try {
-    req.session.destroy(err => {
+    req.session.destroy((err) => {
       if (err) {
         res.status(500).json(err);
       }
@@ -55,4 +54,4 @@ export const logoutUser = async (req, res) => {
   } catch (error) {
     res.status(400).json(error);
   }
-}
+};
