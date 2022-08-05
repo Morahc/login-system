@@ -1,14 +1,12 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import session from 'express-session';
-import MongoDbStore from 'connect-mongodb-session';
 import cors from 'cors';
-import connectDB from './utils/connectDb.js';
+import cookieParser from 'cookie-parser';
+import { connectDB } from './utils/index.js';
 import user from './routes/user.js';
+import admin from './routes/admin.js';
 
 const app = express();
-const store = MongoDbStore(session);
-
 dotenv.config();
 connectDB();
 
@@ -16,33 +14,24 @@ app.use(
   cors({
     origin: 'http://localhost:3000',
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
 app.use(express.json());
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: new store({
-      uri: process.env.MONGO_URI,
-      collection: 'sessions',
-    }),
-    cookie: {
-      maxAge: 360000,
-      httpOnly: true,
-    },
-  })
-);
+app.use(cookieParser());
 
-app.use('/user', user);
+app.use('/api/user', user);
+app.use('/api/admin', admin);
 
-app.get('/protected', (req, res) => {
-  if (req.session.user) {
-    res.send('Welcome to the protected route, ' + req.sessionID);
-  } else {
-    res.send('You are not logged in');
-  }
+app.use((err, req, res, next) => {
+  const errorStatus = err.status || 500;
+  const errorMessage = err.message || 'Something went wrong!';
+  return res.status(errorStatus).json({
+    success: false,
+    message: errorMessage,
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+  });
 });
 
 app.listen(5000, () => {
