@@ -1,26 +1,39 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
-const userSchema = mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    password: {
-      type: String,
-      required: true,
-    },
+const referralSchema = mongoose.Schema({
+  referree: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   },
-  {
-    timestamps: true,
-  }
-);
+});
+
+const userSchema = mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  capital: {
+    type: Number,
+    default: 0,
+    required: true,
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  referrals: [referralSchema],
+});
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
